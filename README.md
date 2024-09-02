@@ -13,6 +13,11 @@ Assnat Ouverte est un projet libre qui vise à améliorer l'accessibilité et la
 - **Histoire :** Examiner le passé pour comprendre l'évolution historique du Québec
 - **Données ouvertes :** Fournir des API permettant à d'autres développeurs ou chercheurs d'utiliser les données
 
+## Organisation
+
+- [`db`](./db) contient les définitions du schéma de la base de données ainsi que certaines fonctions utilitaires.
+- [`data`](./data) contient les données brutes qui sont insérées dans la base de données ainsi que des scripts pour aider l'extraction et la validation de ces données.
+
 ## Utilisation de la langue française
 
 Dans un souci de cohésion et d'arrimage avec les outils utilisés, l'anglais et le français sont utilisés pour ce projet.
