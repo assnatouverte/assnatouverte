@@ -18,7 +18,7 @@ export class UpdateDatabase extends Command<AssnatOuverteContext> {
       });
 
     async execute() {
-        const members = await readMembersFromCsv('./members/members.csv');
+        const members = await readMembersFromCsv(resolve(currentDirname, 'members.csv'));
         await insertMembersInDb(this.context.db, members);
 
         const dbMembers = await getMembersFromDb(this.context.db);
