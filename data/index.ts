@@ -3,6 +3,7 @@ import { loadEnvFile, createDb, Database } from 'assnatouverte-db';
 
 import * as DatabaseCli from './db/cli';
 import * as MembersCli from './members/cli';
+import * as SessionsCli from './sessions/cli';
 
 // Context defition
 export interface AssnatOuverteContext extends BaseContext {
@@ -22,6 +23,10 @@ cli.register(DatabaseCli.MigrateCommand);
 cli.register(MembersCli.UpdateDatabase);
 cli.register(MembersCli.GetAssNat);
 cli.register(MembersCli.GetWikidata);
+
+// Sessions
+cli.register(SessionsCli.UpdateDatabase);
+cli.register(SessionsCli.GetAssNat);
 
 // Help
 cli.register(Builtins.HelpCommand);

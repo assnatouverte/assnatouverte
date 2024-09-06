@@ -3,15 +3,16 @@ import { Bar, Presets } from 'cli-progress';
 import { http } from '../utils/http';
 import { Member } from 'assnatouverte-db/schema/members';
 
-export async function getMembersFromAssNat() {
+/** Extract sessions from the AssNat website */
+export async function getMembersFromAssNat(): Promise<Member[]> {
     const mainPageReq = await http.get('http://www.assnat.qc.ca/fr/membres/notices/index.html').text();
     const mainPage = $.load(mainPageReq);
 
-    // On trouve les liens des pages à lire
+    // Find links to download
     const links = mainPage('.colonneImbriquee>p:nth-of-type(3)>a').map((_, el) => el.attribs['href']).toArray();
     console.log(`${links.length} pages à lire`);
 
-    // Barres de progressions
+    // Setup progress bar
     const progress = new Bar({
         clearOnComplete: true,
         hideCursor: true,
@@ -19,19 +20,18 @@ export async function getMembersFromAssNat() {
     }, Presets.shades_classic);
     progress.start(links.length, 0);
 
-    // Regex utilisées plus tard
+    // Regex used later
     const reMemberId = /\/([a-z0-9\-\(\)]+)(\/index)?\.html/;
     const reParen = /\((.+)\)/;
 
-    // On lit chaque page
+    // Read each page
     const allMembers: Member[] = [];
     const tasks = links.map(async (link: string) => {
         const url = `http://www.assnat.qc.ca${link}`;
         const page = $.load(await http.get(url).text());
 
         const membersEl = page('.colonneImbriquee>div:nth-of-type(4)>div>a').toArray(); // first collumn
-        membersEl.push(...page('.colonneImbriquee>div:nth-of-type(5)>div>a').toArray()); // secpmd column
-        //console.log(`Found ${membersEl.length} members`);
+        membersEl.push(...page('.colonneImbriquee>div:nth-of-type(5)>div>a').toArray()); // second column
 
         for (const member of membersEl) {
             // Extract ID
@@ -64,7 +64,7 @@ export async function getMembersFromAssNat() {
             });
         }
 
-        // Mise à jour de la barre de progression
+        // Update progress bar
         progress.increment();
     });
 

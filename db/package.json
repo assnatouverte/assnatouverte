@@ -5,7 +5,7 @@
 	"type": "module",
 	"main": "index.ts",
 	"scripts": {
-		"migrate": "drizzle-kit generate:pg"
+		"migrate": "drizzle-kit generate"
 	},
 	"dependencies": {
 		"dotenv": "^16.4.5",

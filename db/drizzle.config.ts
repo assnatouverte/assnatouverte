@@ -7,7 +7,7 @@ loadEnvFile();
 export default {
     schema: './schema/*.ts',
     out: './migrations',
-    driver: 'pg',
+    dialect: 'postgresql',
     dbCredentials: {
         host: process.env['DB_HOST']!,
         port: parseInt(process.env['DB_PORT']!),
