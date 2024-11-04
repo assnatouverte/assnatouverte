@@ -1,15 +1,21 @@
-import { AssnatOuverteContext } from '../';
-import { Command } from 'clipanion';
-import { migrate } from 'assnatouverte-db';
+import type { Commands, CommandContext } from "../cli.ts";
+import { migrate } from "@assnatouverte/db";
 
-// Migration command
-export class MigrateCommand extends Command<AssnatOuverteContext> {
-    static override paths = [['migration']];
-    static override usage = Command.Usage({
-        description: 'Met à jour le schéma de la base de données',
-      });
+/**
+ * Commands related to the database
+ */
+export const commands: Commands = {
+  "migrate": {
+    desc: "Met à jour le schéma de la base de données",
+    exec: migration,
+  },
+}
 
-    async execute() {
-        await migrate(this.context.db);
-    }
+/**
+ * Met à jour la base données avec les dernières données du dépôt
+ */
+export async function migration(ctx: CommandContext): Promise<number> {
+  await migrate(ctx.db);
+
+  return 0;
 }

@@ -1,40 +1,54 @@
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
-import { Command } from 'clipanion';
-import { AssnatOuverteContext } from '../';
-import { readSessionsFromCsv, writeSessionsToCsv } from './csv';
-import { insertSessionsInDb, getSessionsFromDb } from './db';
-import { getMembersFromWikidata } from './wikidata';
-import { getSessionsFromAssNat } from './sessions';
+import { resolve } from "@std/path/resolve";
+import type { Commands, CommandContext } from "../cli.ts";
+import { readSessionsFromCsv, writeSessionsToCsv } from "./csv.ts";
+import { getSessionsFromDb, insertSessionsInDb } from "./db.ts";
+import { getSessionsFromAssNat } from "./assnat.ts";
+import { rawDirectory } from "../utils/dir.ts";
 
-const currentFilename = fileURLToPath(import.meta.url);
-const currentDirname = dirname(currentFilename);
-const rawDirectory = resolve(currentDirname, "raw");
+function currentDir(): string {
+  if(!import.meta.dirname) {
+    throw new Error("Les scripts de données doivent être exécutés depuis le dépôt cloné.");
+  }
 
-export class UpdateDatabase extends Command<AssnatOuverteContext> {
-    static override paths = [['sessions', 'update-db']];
-    static override usage = Command.Usage({
-        description: 'Met à jour la base données avec les dernières données du dépôt',
-      });
-
-    async execute() {
-        const sessions = await readSessionsFromCsv(resolve(currentDirname, 'sessions.csv'));
-        await insertSessionsInDb(this.context.db, sessions);
-
-        const dbSessions = await getSessionsFromDb(this.context.db);
-        console.log(`${dbSessions.length} sessions dans la base de données.`);
-    }
+  return import.meta.dirname 
 }
 
-export class GetAssNat extends Command<AssnatOuverteContext> {
-    static override paths = [['sessions', 'assnat']];
-    static override usage = Command.Usage({
-        description: 'Obtient les membres depuis le site web de l\'Assemblée nationale du Québec',
-      });
+/**
+ * Commands related to members
+ */
+export const commands: Commands = {
+  "update-db": {
+    desc: "Met à jour la base données avec les dernières données du dépôt",
+    exec: updateDb,
+  },
+  "assnat": {
+    desc: "Obtient les session depuis le site web de l'Assemblée nationale du Québec",
+    exec: getFromAssNat,
+  },
+}
 
-    async execute() {
-        const sessions = await getSessionsFromAssNat();
-        await writeSessionsToCsv(sessions, resolve(rawDirectory, "assnat.csv"));
-        console.log(`${sessions.length} sessions sur assnat.qc.ca.`);
-    }
+/**
+ * Met à jour la base données avec les dernières données du dépôt
+ */
+export async function updateDb(ctx: CommandContext): Promise<number> {
+  const sessions = await readSessionsFromCsv(
+    resolve(currentDir(), "sessions.csv"),
+  );
+  await insertSessionsInDb(ctx.db, sessions);
+
+  const dbSessions = await getSessionsFromDb(ctx.db);
+  console.log(`${dbSessions.length} sessions dans la base de données.`);
+
+  return 0;
+}
+
+/**
+ * Obtient les sessions depuis le site web de l'Assemblée nationale du Québec
+ */
+export async function getFromAssNat(): Promise<number> {
+  const sessions = await getSessionsFromAssNat();
+  await writeSessionsToCsv(sessions, resolve(rawDirectory, "sessions.csv"));
+  console.log(`${sessions.length} sessions sur assnat.qc.ca.`);
+
+  return 0;
 }

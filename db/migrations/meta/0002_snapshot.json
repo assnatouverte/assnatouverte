@@ -1,4 +1,6 @@
 {
+  "id": "bd12f75b-b680-4956-a114-b34160f02ad8",
+  "prevId": "101741df-3934-4b7a-925d-2309cbe71142",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -46,17 +48,17 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
   "enums": {},
   "schemas": {},
+  "sequences": {},
+  "views": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "id": "ad34811f-fb37-43c0-ad2e-9ab0d4f0d1cb",
-  "prevId": "00000000-0000-0000-0000-000000000000",
-  "sequences": {}
+    "tables": {}
+  }
 }

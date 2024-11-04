@@ -1,42 +1,42 @@
-import { Session } from 'assnatouverte-db/schema/sessions';
-import { createReadStream, createWriteStream, PathLike } from 'fs';
-import { stringify } from 'csv-stringify';
-import { parse } from 'csv-parse';
+import { CsvParseStream } from "@std/csv/parse-stream";
+import { CsvStringifyStream } from "@std/csv/stringify-stream";
+import type { Session } from "@assnatouverte/db/sessions";
+
+const columns = ["legislature", "session", "start", "prorogation", "dissolution"];
 
 /** Read CSV file to retrieve all sessions */
-export async function readSessionsFromCsv(path: PathLike): Promise<Session[]> {
-    const parser = createReadStream(path).pipe(parse({ delimiter: ',', from_line: 2 }));
-    
-    const sessions: Session[] = [];
-    for await (const line of parser) {
-        const session = {
-            legislature: Number(line[0]),
-            session: Number(line[1]),
-            start: line[2] ? new Date(line[2]) : null,
-            prorogation: line[3] ? new Date(line[3]) : null,
-            dissolution: line[4] ? new Date(line[4]) : null,
-        } as Session;
-        sessions.push(session);
-    }
-    return sessions;
+export async function readSessionsFromCsv(path: string | URL): Promise<Session[]> {
+  const file = await Deno.open(path);
+  const pipeline = file.readable
+  .pipeThrough(new TextDecoderStream())
+  .pipeThrough(new CsvParseStream({
+    skipFirstRow: true,
+    columns,
+  }));
+
+  return (await Array.fromAsync(pipeline)).map(x => ({
+      legislature: Number(x.legislature),
+      session: Number(x.session),
+      start: new Date(x.start),
+      prorogation: x.prorogation ? new Date(x.prorogation) : null,
+      dissolution: x.dissolution ? new Date(x.dissolution) : null,
+    })
+  )
 }
 
 /** Write sessions to CSV file */
-export async function writeSessionsToCsv(sessions: Session[], path: PathLike) {
-    const file = createWriteStream(path);
+export async function writeSessionsToCsv(sessions: Session[], path: string | URL) {
+  const csvSessions = sessions.map(x => ({
+    legislature: x.legislature,
+    session: x.session,
+    start: x.start,
+    prorogation: x.prorogation,
+    dissolution: x.dissolution,
+  }));
 
-    const columns = {
-        legislature: 'legislature',
-        session: 'session',
-        start: 'start',
-        prorogation: 'prorogation',
-        dissolution: 'dissolution',
-    };
-    const stringifier = stringify({ header: true, columns });
-    stringifier.pipe(file);
-
-    sessions.forEach((value) => {
-        stringifier.write(value);
-    });
-    stringifier.end();
+  const file = await Deno.open(path, { create: true, write: true });
+  await ReadableStream.from(csvSessions)
+  .pipeThrough(new CsvStringifyStream({ columns }))
+  .pipeThrough(new TextEncoderStream())
+  .pipeTo(file.writable);
 }

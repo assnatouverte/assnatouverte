@@ -1,0 +1,17 @@
+{
+  "name": "@assnatouverte/data",
+  "exports": "./mod.ts",
+  "scripts": {
+    "migrate": "drizzle-kit generate"
+  },
+  "imports": {
+    "@std/cli": "jsr:@std/cli@^1.0.6",
+    "@std/csv": "jsr:@std/csv@^1.0.3",
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.2",
+    "@std/path": "jsr:@std/path@^1.0.8",
+    "any-date-parser": "npm:any-date-parser@^1.5.4",
+    "cheerio": "npm:cheerio@^1.0.0",
+    "cli-progress": "npm:cli-progress@^3.12.0",
+    "ky": "npm:ky@^1.7.2"
+  }
+}

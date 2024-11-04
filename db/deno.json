@@ -1,0 +1,22 @@
+{
+  "name": "@assnatouverte/db",
+  "exports": {
+    ".": "./mod.ts",
+    "./members": "./schema/members.ts",
+    "./sessions": "./schema/sessions.ts"
+  },
+  "tasks": {
+    "generate-migration": "deno run --node-modules-dir -A npm:drizzle-kit generate --config=drizzle.config.ts"
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-slow-types"]
+    }
+  },
+  "imports": {
+    "@std/dotenv": "jsr:@std/dotenv@^0.225.2",
+    "@std/path": "jsr:@std/path@^1.0.8",
+    "drizzle-kit": "npm:drizzle-kit@^0.26.2",
+    "postgres": "npm:postgres@^3.4.4"
+  }
+}

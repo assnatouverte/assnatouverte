@@ -1,0 +1,26 @@
+{
+  "workspace": ["./db", "./data", "./website"],
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.asynciterable",
+      "dom.iterable",
+      "deno.ns"
+    ],
+    "jsx": "precompile",
+    "jsxImportSource": "preact",
+    "jsxPrecompileSkipElements": [
+      "a",
+      "img",
+      "source",
+      "body",
+      "html",
+      "head"
+    ]
+  },
+  "imports": {
+    "preact": "npm:preact@^10.24.3",
+    "drizzle-orm": "npm:drizzle-orm@^0.35.3"
+  },
+  "nodeModulesDir": "auto"
+}
