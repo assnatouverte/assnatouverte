@@ -17,7 +17,7 @@ export type Database = PostgresJsDatabase;
 
 /** Load environment file from root directory */
 export function loadEnvFile() {
-  const envPath = resolve(Deno.cwd(), ".env");
+  const envPath = import.meta.dirname ? resolve(import.meta.dirname, "../.env") : resolve(Deno.cwd(), ".env");
   loadSync({ envPath, export: true });
   checkEnvVariables();
 }
@@ -49,13 +49,17 @@ export function createDb(): [postgres.Sql, Database] {
     password: Deno.env.get(ENV_DB_PASSWORD)!,
     database: Deno.env.get(ENV_DB_NAME)!,
     ssl: "prefer",
+    max: 10, // number of concurrent connections
+    connection: {
+      application_name: "assnatouverte", // Advertised application name
+    }
   });
   const db = drizzle(client);
   return [client, db];
 }
 
 /** Perform all migrations to update the database schema to the latest */
-export async function migrate(db: PostgresJsDatabase) {
+export async function migrate(db: Database) {
   const migrationsFolder = resolve(import.meta.dirname || Deno.cwd(), "./migrations");
   await drizzleMigrate(db, {
     migrationsFolder,
