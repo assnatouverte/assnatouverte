@@ -1,9 +1,58 @@
 {
-  "id": "bd12f75b-b680-4956-a114-b34160f02ad8",
+  "id": "af5b253f-6688-48c7-8585-04a2f86e5da5",
   "prevId": "101741df-3934-4b7a-925d-2309cbe71142",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.sessions": {
+      "name": "sessions",
+      "schema": "",
+      "columns": {
+        "legislature": {
+          "name": "legislature",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "session": {
+          "name": "session",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start": {
+          "name": "start",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prorogation": {
+          "name": "prorogation",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dissolution": {
+          "name": "dissolution",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "sessions_legislature_session_pk": {
+          "name": "sessions_legislature_session_pk",
+          "columns": [
+            "legislature",
+            "session"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "public.members": {
       "name": "members",
       "schema": "",
@@ -48,6 +97,73 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.members_sessions": {
+      "name": "members_sessions",
+      "schema": "",
+      "columns": {
+        "legislature": {
+          "name": "legislature",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "session": {
+          "name": "session",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "member_id": {
+          "name": "member_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "members_sessions_member_id_members_id_fk": {
+          "name": "members_sessions_member_id_members_id_fk",
+          "tableFrom": "members_sessions",
+          "tableTo": "members",
+          "columnsFrom": [
+            "member_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "members_sessions_legislature_session_sessions_legislature_session_fk": {
+          "name": "members_sessions_legislature_session_sessions_legislature_session_fk",
+          "tableFrom": "members_sessions",
+          "tableTo": "sessions",
+          "columnsFrom": [
+            "legislature",
+            "session"
+          ],
+          "columnsTo": [
+            "legislature",
+            "session"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "members_sessions_legislature_session_member_id_pk": {
+          "name": "members_sessions_legislature_session_member_id_pk",
+          "columns": [
+            "legislature",
+            "session",
+            "member_id"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "checkConstraints": {}
     }

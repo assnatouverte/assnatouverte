@@ -15,6 +15,13 @@
       "when": 1725583951232,
       "tag": "0001_many_thunderbolt_ross",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1731106737714,
+      "tag": "0002_dapper_khan",
+      "breakpoints": true
     }
   ]
 }

@@ -6,7 +6,7 @@
     "./sessions": "./schema/sessions.ts"
   },
   "tasks": {
-    "generate-migration": "deno run --node-modules-dir -A npm:drizzle-kit generate --config=drizzle.config.ts"
+    "generate": "deno run --node-modules-dir -A npm:drizzle-kit generate --dialect=postgresql --schema=./schema/ --out ./migrations"
   },
   "lint": {
     "rules": {

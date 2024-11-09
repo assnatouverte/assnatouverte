@@ -1,4 +1,6 @@
-import { date, pgTable, primaryKey, smallint } from "drizzle-orm/pg-core";
+import { relations } from 'drizzle-orm';
+import { date, pgTable, primaryKey, smallint } from 'drizzle-orm/pg-core';
+import { members, membersToSessions } from "./members.ts";
 
 export const sessions = pgTable("sessions", {
   legislature: smallint("legislature").notNull(), // Legislature number, starting at 1
@@ -11,6 +13,10 @@ export const sessions = pgTable("sessions", {
     pk: primaryKey({ columns: [t.legislature, t.session] }),
   };
 });
+
+export const sessionsToMembers = relations(sessions, ({many}) => ({
+  membersToSessions: many(membersToSessions),
+}));
 
 export type Session = typeof sessions.$inferSelect;
 export type NewSession = typeof sessions.$inferInsert;
