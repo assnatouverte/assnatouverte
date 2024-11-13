@@ -4,6 +4,7 @@ import { createDb, loadEnvFile } from "../db/mod.ts";
 import { commands as dbCommands } from "./db/cli.ts";
 import { commands as memberCommands } from "./members/cli.ts";
 import { commands as sessionsCommands } from "./sessions/cli.ts";
+import { commands as hansardsCommands } from "./hansards/cli.ts";
 
 /**
  * Dictionnary of commands provided by a module
@@ -36,6 +37,7 @@ const commands: Record<string, Commands> = {
     "db": dbCommands,
     "membres": memberCommands,
     "sessions": sessionsCommands,
+    "journaux": hansardsCommands,
 }
 
 function printHelp() {

@@ -69,12 +69,15 @@ export async function migrate(db: Database) {
 }
 
 /** Build the `set` argument of a `onConflictDoUpdate` to update all the columns */
-export function buildConflictUpdateColumns<T extends Table>(
+export function buildConflictUpdateColumns<T extends Table, Q extends Extract<keyof T['_']['columns'], string>>(
   table: T,
+  except?: Q[]
 ): Record<string, SQL> {
   const columns = getTableColumns(table)!;
-  return Object.entries(columns).reduce((acc, [key, column]) => {
+  return Object.entries(columns).filter(([x]) => except ? !except.includes(x) : true).reduce((acc, [key, column]) => {
     acc[key] = sql.raw(`excluded.${column.name}`);
     return acc;
   }, {} as Record<string, SQL>);
 }
+
+// select speeches.order, ts_headline('french', text, query, 'MaxFragments=3') from speeches, to_tsquery('french', 'climat') query where search @@ query order by speeches.order;

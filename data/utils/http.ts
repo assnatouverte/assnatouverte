@@ -8,9 +8,9 @@ import { hrtime } from "node:process";
 
 // Constants
 const USER_AGENT = "assnatouverte <info@assnatouverte.ca>";
-const TIMEOUT_MS = 5_000;
-const MAX_CONCURRENT_REQUESTS = 5;
-const MIN_DELAY_MS = 100;
+const TIMEOUT_MS = 20_000;
+const MAX_CONCURRENT_REQUESTS = 1;
+const MIN_DELAY_MS = 1000;
 const MIN_DELAY_NS = BigInt(MIN_DELAY_MS) * 1_000_000n;
 
 // Rate limiting
@@ -54,6 +54,7 @@ export const http = ky.create({
   headers: {
     "user-agent": USER_AGENT,
   },
+  retry: 3,
   timeout: TIMEOUT_MS,
   hooks: {
     beforeRequest: [beforeRequest],

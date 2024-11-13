@@ -3,7 +3,8 @@
   "exports": {
     ".": "./mod.ts",
     "./members": "./schema/members.ts",
-    "./sessions": "./schema/sessions.ts"
+    "./sessions": "./schema/sessions.ts",
+    "./hansards": "./schema/hansards.ts"
   },
   "tasks": {
     "generate": "deno run --node-modules-dir -A npm:drizzle-kit generate --dialect=postgresql --schema=./schema/ --out ./migrations"
