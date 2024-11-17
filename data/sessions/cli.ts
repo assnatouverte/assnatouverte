@@ -1,16 +1,18 @@
 import { resolve } from "@std/path/resolve";
-import type { Commands, CommandContext } from "../cli.ts";
+import type { CommandContext, Commands } from "../cli.ts";
 import { readSessionsFromCsv, writeSessionsToCsv } from "./csv.ts";
 import { getSessionsFromDb, insertSessionsInDb } from "./db.ts";
 import { getSessionsFromAssNat } from "./assnat.ts";
 import { rawDirectory } from "../utils/dir.ts";
 
 function currentDir(): string {
-  if(!import.meta.dirname) {
-    throw new Error("Les scripts de données doivent être exécutés depuis le dépôt cloné.");
+  if (!import.meta.dirname) {
+    throw new Error(
+      "Les scripts de données doivent être exécutés depuis le dépôt cloné.",
+    );
   }
 
-  return import.meta.dirname 
+  return import.meta.dirname;
 }
 
 /**
@@ -22,10 +24,11 @@ export const commands: Commands = {
     exec: updateDb,
   },
   "assnat": {
-    desc: "Obtient les session depuis le site web de l'Assemblée nationale du Québec",
+    desc:
+      "Obtient les session depuis le site web de l'Assemblée nationale du Québec",
     exec: getFromAssNat,
   },
-}
+};
 
 /**
  * Met à jour la base données avec les dernières données du dépôt

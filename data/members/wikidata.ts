@@ -11,27 +11,27 @@ WHERE
 ORDER BY ?idAssNat`;
 
 export interface MemberWikidata {
-  id: string,
-  id_wikidata: string,
-  name?: string,
-};
+  id: string;
+  id_wikidata: string;
+  name?: string;
+}
 
 interface WikidataResponse<T> {
-  results: WikidataResult<T>,
+  results: WikidataResult<T>;
 }
 
 interface WikidataResult<T> {
-  bindings: T[],
+  bindings: T[];
 }
 
 interface WikidataBinding<T> {
-  value: T,
+  value: T;
 }
 
 interface AssnatQueryResult {
-  idAssNat: WikidataBinding<string>,
-  idWikidataText: WikidataBinding<string>,
-  name?: WikidataBinding<string>,
+  idAssNat: WikidataBinding<string>;
+  idWikidataText: WikidataBinding<string>;
+  name?: WikidataBinding<string>;
 }
 
 /** Retrieve members from a SparQL query on Wikidata */
@@ -44,15 +44,18 @@ export async function getMembersFromWikidata(): Promise<MemberWikidata[]> {
   });
   const data = await response.json() as WikidataResponse<AssnatQueryResult>;
 
-  return data.results.bindings.map(x => ({
+  return data.results.bindings.map((x) => ({
     id: x.idAssNat.value,
     id_wikidata: x.idWikidataText.value,
     name: x.name?.value,
   }));
 }
 
-export async function writeMemberWikidataToCsv(members: MemberWikidata[], path: string | URL) {
-  const csvMembers = members.map(x => ({
+export async function writeMemberWikidataToCsv(
+  members: MemberWikidata[],
+  path: string | URL,
+) {
+  const csvMembers = members.map((x) => ({
     id: x.id,
     id_wikidata: x.id_wikidata,
     name: x.name || "",
@@ -60,7 +63,9 @@ export async function writeMemberWikidataToCsv(members: MemberWikidata[], path: 
 
   const file = await Deno.open(path, { create: true, write: true });
   await ReadableStream.from(csvMembers)
-  .pipeThrough(new CsvStringifyStream({ columns: ["id", "id_wikidata", "name"] }))
-  .pipeThrough(new TextEncoderStream())
-  .pipeTo(file.writable);
+    .pipeThrough(
+      new CsvStringifyStream({ columns: ["id", "id_wikidata", "name"] }),
+    )
+    .pipeThrough(new TextEncoderStream())
+    .pipeTo(file.writable);
 }

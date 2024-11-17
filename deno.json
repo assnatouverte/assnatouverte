@@ -18,9 +18,12 @@
       "head"
     ]
   },
+  "fmt": {
+    "exclude": ["data/raw/"]
+  },
   "imports": {
     "preact": "npm:preact@^10.24.3",
     "drizzle-orm": "npm:drizzle-orm@^0.35.3"
   },
-  "nodeModulesDir": "auto"
+  "nodeModulesDir": "none"
 }

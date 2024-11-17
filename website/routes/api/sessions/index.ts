@@ -4,7 +4,9 @@ import { desc } from "drizzle-orm";
 
 export const handler = define.handlers({
   async GET(ctx) {
-    const result = await ctx.state.db.select().from(sessions).orderBy(desc(sessions.start));
+    const result = await ctx.state.db.select().from(sessions).orderBy(
+      desc(sessions.start),
+    );
     return Response.json(result);
   },
 });

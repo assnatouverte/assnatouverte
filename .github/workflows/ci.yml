@@ -1,0 +1,27 @@
+name: Continuous Integration
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Lint check
+        run: deno lint
+      - name: Format check
+        run: deno fmt --check
+      - name: Build container
+        run: >
+          docker buildx build --build-arg GIT_REVISION=${{ github.sha }} -t assnatouverte:${{ github.sha }} . &&
+          docker image save assnatouverte:${{ github.sha }} | gzip > assnatouverte_${{ github.sha }}.tar.gz
+      - name: Save container artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: assnatouverte
+          path: assnatouverte_${{ github.sha }}.tar.gz
+          compression-level: 0
+          if-no-files-found: error

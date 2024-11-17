@@ -1,6 +1,12 @@
-import { relations } from 'drizzle-orm';
-import { pgTable, primaryKey, foreignKey, varchar, smallint } from 'drizzle-orm/pg-core';
-import { sessions } from './sessions.ts';
+import { relations } from "drizzle-orm";
+import {
+  foreignKey,
+  pgTable,
+  primaryKey,
+  smallint,
+  varchar,
+} from "drizzle-orm/pg-core";
+import { sessions } from "./sessions.ts";
 
 // deno-lint-ignore no-slow-types
 export const members = pgTable("members", {
@@ -14,30 +20,36 @@ export const members = pgTable("members", {
   wikidata_id: varchar("wikidata_id"), // Id to the Wikidata object
 });
 
-export const membersRelations = relations(members, ({many}) => ({
+export const membersRelations = relations(members, ({ many }) => ({
   membersToSessions: many(membersToSessions),
 }));
 
 // JOIN table to associate members to sessions
-export const membersToSessions = pgTable('members_sessions', {
+export const membersToSessions = pgTable("members_sessions", {
   legislature: smallint("legislature").notNull(),
   session: smallint("session").notNull(),
   member_id: varchar("member_id").notNull().references(() => members.id),
 }, (t) => ({
-  pk: primaryKey({ columns: [t.legislature, t.session, t.member_id]}),
-  fk: foreignKey({ columns: [t.legislature, t.session], foreignColumns: [sessions.legislature, sessions.session]})
+  pk: primaryKey({ columns: [t.legislature, t.session, t.member_id] }),
+  fk: foreignKey({
+    columns: [t.legislature, t.session],
+    foreignColumns: [sessions.legislature, sessions.session],
+  }),
 }));
 
-export const membersToSessionsRelations = relations(membersToSessions, ({ one }) => ({
-  session: one(sessions, {
-    fields: [membersToSessions.legislature, membersToSessions.session],
-    references: [sessions.legislature, sessions.session],
+export const membersToSessionsRelations = relations(
+  membersToSessions,
+  ({ one }) => ({
+    session: one(sessions, {
+      fields: [membersToSessions.legislature, membersToSessions.session],
+      references: [sessions.legislature, sessions.session],
+    }),
+    member: one(members, {
+      fields: [membersToSessions.member_id],
+      references: [members.id],
+    }),
   }),
-  member: one(members, {
-    fields: [membersToSessions.member_id],
-    references: [members.id],
-  }),
-}));
+);
 
 export type Member = typeof members.$inferSelect;
 export type NewMember = typeof members.$inferInsert;

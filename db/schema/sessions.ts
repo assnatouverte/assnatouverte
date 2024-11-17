@@ -1,6 +1,6 @@
-import { relations } from 'drizzle-orm';
-import { date, pgTable, primaryKey, smallint } from 'drizzle-orm/pg-core';
-import { members, membersToSessions } from "./members.ts";
+import { relations } from "drizzle-orm";
+import { date, pgTable, primaryKey, smallint } from "drizzle-orm/pg-core";
+import { membersToSessions } from "./members.ts";
 
 export const sessions = pgTable("sessions", {
   legislature: smallint("legislature").notNull(), // Legislature number, starting at 1
@@ -14,7 +14,7 @@ export const sessions = pgTable("sessions", {
   };
 });
 
-export const sessionsToMembers = relations(sessions, ({many}) => ({
+export const sessionsToMembers = relations(sessions, ({ many }) => ({
   membersToSessions: many(membersToSessions),
 }));
 

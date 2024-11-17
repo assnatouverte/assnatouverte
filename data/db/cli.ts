@@ -1,4 +1,4 @@
-import type { Commands, CommandContext } from "../cli.ts";
+import type { CommandContext, Commands } from "../cli.ts";
 import { migrate } from "@assnatouverte/db";
 
 /**
@@ -9,7 +9,7 @@ export const commands: Commands = {
     desc: "Met à jour le schéma de la base de données",
     exec: migration,
   },
-}
+};
 
 /**
  * Met à jour la base données avec les dernières données du dépôt

@@ -1,0 +1,21 @@
+# env files
+.env*
+
+# direnv
+/.direnv
+.envrc
+
+# Git
+.git/
+
+# VSCode
+.vscode/
+
+# NodeJS
+**/node_modules/
+
+# Raw data
+/data/raw/
+
+# Generated files
+/website/_fresh/

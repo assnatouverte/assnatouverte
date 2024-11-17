@@ -19,7 +19,6 @@ let numActiveRequests: number = 0;
 const pendingRequests: { (): void }[] = [];
 
 async function beforeRequest() {
-
   // Check if too many active requests
   if (numActiveRequests >= MAX_CONCURRENT_REQUESTS) {
     const promise = new Promise<void>((done) => pendingRequests.push(done));
@@ -63,6 +62,6 @@ export const http = ky.create({
     beforeError: [(err) => {
       afterResponse();
       return err;
-    }]
+    }],
   },
 });

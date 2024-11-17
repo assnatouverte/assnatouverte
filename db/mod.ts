@@ -17,7 +17,9 @@ export type Database = PostgresJsDatabase;
 
 /** Load environment file from root directory */
 export function loadEnvFile() {
-  const envPath = import.meta.dirname ? resolve(import.meta.dirname, "../.env") : resolve(Deno.cwd(), ".env");
+  const envPath = import.meta.dirname
+    ? resolve(import.meta.dirname, "../.env")
+    : resolve(Deno.cwd(), ".env");
   loadSync({ envPath, export: true });
   checkEnvVariables();
 }
@@ -52,15 +54,18 @@ export function createDb(): [postgres.Sql, Database] {
     max: 10, // number of concurrent connections
     connection: {
       application_name: "assnatouverte", // Advertised application name
-    }
+    },
   });
-  const db = drizzle(client);
+  const db = drizzle({ client, logger: true });
   return [client, db];
 }
 
 /** Perform all migrations to update the database schema to the latest */
 export async function migrate(db: Database) {
-  const migrationsFolder = resolve(import.meta.dirname || Deno.cwd(), "./migrations");
+  const migrationsFolder = resolve(
+    import.meta.dirname || Deno.cwd(),
+    "./migrations",
+  );
   await drizzleMigrate(db, {
     migrationsFolder,
     migrationsTable: "migrations",
@@ -69,15 +74,18 @@ export async function migrate(db: Database) {
 }
 
 /** Build the `set` argument of a `onConflictDoUpdate` to update all the columns */
-export function buildConflictUpdateColumns<T extends Table, Q extends Extract<keyof T['_']['columns'], string>>(
+export function buildConflictUpdateColumns<
+  T extends Table,
+  Q extends Extract<keyof T["_"]["columns"], string>,
+>(
   table: T,
-  except?: Q[]
+  except?: Q[],
 ): Record<string, SQL> {
   const columns = getTableColumns(table)!;
-  return Object.entries(columns).filter(([x]) => except ? !except.includes(x) : true).reduce((acc, [key, column]) => {
+  return Object.entries(columns).filter(([x]) =>
+    except ? !except.includes(x) : true
+  ).reduce((acc, [key, column]) => {
     acc[key] = sql.raw(`excluded.${column.name}`);
     return acc;
   }, {} as Record<string, SQL>);
 }
-
-// select speeches.order, ts_headline('french', text, query, 'MaxFragments=3') from speeches, to_tsquery('french', 'climat') query where search @@ query order by speeches.order;

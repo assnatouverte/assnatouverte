@@ -5,10 +5,14 @@ import { desc, eq } from "drizzle-orm";
 export const handler = define.handlers({
   async GET(ctx) {
     const legislatureNum = parseInt(ctx.params.legislature);
-    if(isNaN(legislatureNum)) {
-        return new Response(JSON.stringify({message: "not a number"}), {status: 400})
+    if (isNaN(legislatureNum)) {
+      return new Response(JSON.stringify({ message: "not a number" }), {
+        status: 400,
+      });
     }
-    const result = await ctx.state.db.select().from(sessions).where(eq(sessions.legislature, legislatureNum)).orderBy(desc(sessions.start));
+    const result = await ctx.state.db.select().from(sessions).where(
+      eq(sessions.legislature, legislatureNum),
+    ).orderBy(desc(sessions.start));
     return Response.json(result);
   },
 });

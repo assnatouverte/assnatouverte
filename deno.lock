@@ -1,10 +1,10 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@fresh/core@^2.0.0-alpha.23": "2.0.0-alpha.23",
+    "jsr:@fresh/core@^2.0.0-alpha.1": "2.0.0-alpha.25",
+    "jsr:@fresh/core@^2.0.0-alpha.25": "2.0.0-alpha.25",
     "jsr:@fresh/plugin-tailwind@^0.0.1-alpha.7": "0.0.1-alpha.7",
     "jsr:@luca/esbuild-deno-loader@0.11": "0.11.0",
-    "jsr:@luca/esbuild-deno-loader@0.11.0": "0.11.0",
     "jsr:@std/assert@0.221": "0.221.0",
     "jsr:@std/bytes@^1.0.2": "1.0.2",
     "jsr:@std/cli@^1.0.6": "1.0.6",
@@ -14,14 +14,16 @@
     "jsr:@std/dotenv@~0.225.2": "0.225.2",
     "jsr:@std/encoding@1": "1.0.5",
     "jsr:@std/encoding@^1.0.5": "1.0.5",
-    "jsr:@std/fmt@1": "1.0.2",
-    "jsr:@std/fs@1": "1.0.4",
+    "jsr:@std/fmt@1": "1.0.3",
+    "jsr:@std/fs@1": "1.0.5",
     "jsr:@std/html@1": "1.0.3",
+    "jsr:@std/json@1": "1.0.1",
     "jsr:@std/jsonc@1": "1.0.1",
-    "jsr:@std/media-types@1": "1.0.3",
+    "jsr:@std/media-types@1": "1.1.0",
     "jsr:@std/path@0.221": "0.221.0",
-    "jsr:@std/path@1": "1.0.6",
-    "jsr:@std/path@^1.0.6": "1.0.6",
+    "jsr:@std/path@1": "1.0.8",
+    "jsr:@std/path@^1.0.6": "1.0.8",
+    "jsr:@std/path@^1.0.7": "1.0.8",
     "jsr:@std/path@^1.0.8": "1.0.8",
     "jsr:@std/semver@1": "1.0.3",
     "jsr:@std/streams@^1.0.4": "1.0.7",
@@ -49,10 +51,10 @@
     "npm:tailwindcss@^3.4.1": "3.4.3_postcss@8.4.47"
   },
   "jsr": {
-    "@fresh/core@2.0.0-alpha.23": {
-      "integrity": "531122329cde29b21c527dd04c5e04e5d4882ffc292302378c218ef0d4ab5f03",
+    "@fresh/core@2.0.0-alpha.25": {
+      "integrity": "1069232989c4bc7f69ad424f6b97cdba1a7631d1307e1c2964aed748cd0cf74b",
       "dependencies": [
-        "jsr:@luca/esbuild-deno-loader@0.11",
+        "jsr:@luca/esbuild-deno-loader",
         "jsr:@std/crypto",
         "jsr:@std/datetime",
         "jsr:@std/encoding@1",
@@ -74,6 +76,7 @@
     "@fresh/plugin-tailwind@0.0.1-alpha.7": {
       "integrity": "b940991bdb76f0995dc58b25183f1001d72c4020e049d384ad3fb751556aa2a9",
       "dependencies": [
+        "jsr:@fresh/core@^2.0.0-alpha.1",
         "jsr:@std/path@0.221",
         "npm:autoprefixer",
         "npm:cssnano",
@@ -116,32 +119,35 @@
     "@std/encoding@1.0.5": {
       "integrity": "ecf363d4fc25bd85bd915ff6733a7e79b67e0e7806334af15f4645c569fefc04"
     },
-    "@std/fmt@1.0.2": {
-      "integrity": "87e9dfcdd3ca7c066e0c3c657c1f987c82888eb8103a3a3baa62684ffeb0f7a7"
+    "@std/fmt@1.0.3": {
+      "integrity": "97765c16aa32245ff4e2204ecf7d8562496a3cb8592340a80e7e554e0bb9149f"
     },
-    "@std/fs@1.0.4": {
-      "integrity": "2907d32d8d1d9e540588fd5fe0ec21ee638134bd51df327ad4e443aaef07123c",
+    "@std/fs@1.0.5": {
+      "integrity": "41806ad6823d0b5f275f9849a2640d87e4ef67c51ee1b8fb02426f55e02fd44e",
       "dependencies": [
-        "jsr:@std/path@^1.0.6"
+        "jsr:@std/path@^1.0.7"
       ]
     },
     "@std/html@1.0.3": {
       "integrity": "7a0ac35e050431fb49d44e61c8b8aac1ebd55937e0dc9ec6409aa4bab39a7988"
     },
-    "@std/jsonc@1.0.1": {
-      "integrity": "6b36956e2a7cbb08ca5ad7fbec72e661e6217c202f348496ea88747636710dda"
+    "@std/json@1.0.1": {
+      "integrity": "1f0f70737e8827f9acca086282e903677bc1bb0c8ffcd1f21bca60039563049f"
     },
-    "@std/media-types@1.0.3": {
-      "integrity": "b12d30a7852f7578f4d210622df713bbfd1cbdd9b4ec2eaf5c1845ab70bab159"
+    "@std/jsonc@1.0.1": {
+      "integrity": "6b36956e2a7cbb08ca5ad7fbec72e661e6217c202f348496ea88747636710dda",
+      "dependencies": [
+        "jsr:@std/json"
+      ]
+    },
+    "@std/media-types@1.1.0": {
+      "integrity": "c9d093f0c05c3512932b330e3cc1fe1d627b301db33a4c2c2185c02471d6eaa4"
     },
     "@std/path@0.221.0": {
       "integrity": "0a36f6b17314ef653a3a1649740cc8db51b25a133ecfe838f20b79a56ebe0095",
       "dependencies": [
         "jsr:@std/assert"
       ]
-    },
-    "@std/path@1.0.6": {
-      "integrity": "ab2c55f902b380cf28e0eec501b4906e4c1960d13f00e11cfbcd21de15f18fed"
     },
     "@std/path@1.0.8": {
       "integrity": "548fa456bb6a04d3c1a1e7477986b6cffbce95102d0bb447c67c4ee70e0364be"
@@ -2049,7 +2055,7 @@
       },
       "website": {
         "dependencies": [
-          "jsr:@fresh/core@^2.0.0-alpha.23",
+          "jsr:@fresh/core@^2.0.0-alpha.25",
           "jsr:@fresh/plugin-tailwind@^0.0.1-alpha.7",
           "npm:@preact/signals@^1.3.0",
           "npm:tailwindcss@3.4.3"
