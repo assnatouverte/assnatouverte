@@ -3,27 +3,34 @@ import { proceedings, speeches } from "@assnatouverte/db/hansards";
 import { sql, getTableColumns, eq, desc } from "drizzle-orm";
 import { page } from "fresh";
 
+interface Extract {
+  speaker: string,
+  extract: string,
+}
+
 export const handler = define.handlers({
     async GET(ctx) {
       const url = new URL(ctx.req.url);
       const query = url.searchParams.get("q") || "";
 
-      /*const results = ctx.state.db.execute(
-        sql`select speeches.order, ts_headline('french', text, query, 'MaxFragments=3') from speeches, to_tsquery('french', 'climat') query where search @@ query order by speeches.order;`.from()*/
-      const matchQuery = sql`to_tsquery('french', ${query})`
-      const results = await ctx.state.db.select({
-        ...getTableColumns(speeches),
-        ...getTableColumns(proceedings),
-        extract: sql`ts_headline('french', text, ${matchQuery})`,
-        rank: sql`ts_rank(search, ${matchQuery})`
-      })
-        .from(speeches)
-        .innerJoin(proceedings, eq(proceedings.id, speeches.proceeding_id))
-        .where(sql`${speeches.search} @@ ${matchQuery}`)
-        .orderBy((t) => desc(t.rank))
-        .limit(100);
-    
-      return page({ results, query });
+      if (query) {
+        const matchQuery = sql`websearch_to_tsquery('french', ${query})`
+        const results = await ctx.state.db.select({
+          ...getTableColumns(proceedings),
+          rank: sql<number>`sum(ts_rank(${speeches.search}, ${matchQuery}))`,
+          extracts: sql<Extract[]>`json_agg(json_build_object('speaker', ${speeches.speaker}, 'extract', ts_headline('french', ${speeches.text}, ${matchQuery})) order by ${speeches.order})`
+        })
+          .from(speeches)
+          .innerJoin(proceedings, eq(proceedings.id, speeches.proceeding_id))
+          .where(sql`${speeches.search} @@ ${matchQuery}`)
+          .groupBy(proceedings.id)
+          .orderBy((t) => desc(t.rank))
+          .limit(25);
+
+        return page({ results, query });
+      } else {
+        return page({ results: [], query });
+      }
     },
 });
 
@@ -45,7 +52,16 @@ export default define.page<typeof handler>(({data}) => {
         </div>
       </form>
       <div>
-        {results.map(({extract, rank}) => <p>[{rank}] {extract}</p>)}
+        {results.map(({extracts, legislature, session, id, date}) =>
+        <div class="border-2 rounded-lg my-2 px-12 py-3">
+          <h3 class="text-lg font-bold hover:underline my-3"><a href={`/${legislature}/${session}/${id}`}>{`${id} - ${date.toISOString()}`}</a></h3>
+          {extracts.map(({speaker, extract}) => 
+            <div>
+              <span class="text-md">{speaker} : </span>
+              <span class="pl-1 italic" dangerouslySetInnerHTML={{__html: extract}}/>
+            </div>
+          )}
+        </div>)}
       </div>
     </div>
   );
