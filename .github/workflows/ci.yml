@@ -15,7 +15,7 @@ jobs:
       - name: Format check
         run: deno fmt --check
       - name: Build container
-        run: >
+        run: |
           docker buildx build --build-arg GIT_REVISION=${{ github.sha }} -t assnatouverte:${{ github.sha }} . &&
           docker image save assnatouverte:${{ github.sha }} | gzip > assnatouverte_${{ github.sha }}.tar.gz
       - name: Save container artifact
@@ -25,3 +25,22 @@ jobs:
           path: assnatouverte_${{ github.sha }}.tar.gz
           compression-level: 0
           if-no-files-found: error
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Download container artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: assnatouverte
+      - name: Upload to GHCR
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/assnatouverte:${{ github.sha }}
+          docker load < assnatouverte_${{ github.sha }}.tar.gz &&
+          docker tag assnatouverte:${{ github.sha }} $IMAGE_ID &&
+          docker push $IMAGE_ID
