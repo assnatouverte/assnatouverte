@@ -1,4 +1,4 @@
-import { define } from "../../../utils.ts";
+import { define } from "../../../../utils.ts";
 import { proceedings } from "@assnatouverte/db/hansards";
 import { and, desc, eq } from "drizzle-orm";
 import { HttpError, page } from "fresh";
@@ -32,7 +32,7 @@ export default define.page<typeof handler>(({ data }) => {
       <td class="p-2 text-sm text-gray-700">
         <a
           class="font-bold text-blue-500 hover:underline"
-          href={`/${x.legislature}/${x.session}/${x.id}`}
+          href={`/legislatures/${x.legislature}/${x.session}/${x.id}`}
         >
           {x.id}
         </a>

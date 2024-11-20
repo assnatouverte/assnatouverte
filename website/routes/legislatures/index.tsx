@@ -1,32 +1,26 @@
 import { define } from "../../utils.ts";
 import { sessions } from "@assnatouverte/db/sessions";
-import { eq } from "drizzle-orm";
-import { HttpError, page } from "fresh";
+import { desc } from "drizzle-orm";
+import { page } from "fresh";
 
 export const handler = define.handlers({
   async GET(ctx) {
-    const { legislature } = ctx.params;
-    console.log(legislature);
-
-    const allSessions = await ctx.state.db.select().from(sessions).where(
-      eq(sessions.legislature, Number(legislature)),
+    const allLegislatures = await ctx.state.db.select().from(sessions).orderBy(
+      desc(sessions.legislature),
+      desc(sessions.session),
     );
 
-    if (allSessions.length == 0) {
-      throw new HttpError(404);
-    }
-
-    return page({ sessions: allSessions });
+    return page({ legislatures: allLegislatures });
   },
 });
 
 export default define.page<typeof handler>(({ data }) => {
-  const { sessions } = data;
-  const rows = sessions.map((x) => (
+  const { legislatures } = data;
+  const rows = legislatures.map((x) => (
     <tr>
       <td>{x.legislature}</td>
       <td>
-        <a href={`/${x.legislature}/${x.session}`}>{x.session}</a>
+        <a href={`/legislatures/${x.legislature}/${x.session}`}>{x.session}</a>
       </td>
       <td>{x.start.toISOString()}</td>
     </tr>

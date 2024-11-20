@@ -1,4 +1,6 @@
 import type { PageProps } from "fresh";
+import Header from "../components/header.tsx";
+import Footer from "../components/footer.tsx";
 
 export default function App({ Component }: PageProps) {
   return (
@@ -11,7 +13,9 @@ export default function App({ Component }: PageProps) {
         <link rel="stylesheet" href="/styles.css" />
       </head>
       <body>
+        <Header />
         <Component />
+        <Footer />
       </body>
     </html>
   );

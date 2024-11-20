@@ -1,4 +1,4 @@
-import { define } from "../../../utils.ts";
+import { define } from "../../../../utils.ts";
 import { proceedings, speeches } from "@assnatouverte/db/hansards";
 import { and, asc, eq } from "drizzle-orm";
 import { HttpError, page } from "fresh";

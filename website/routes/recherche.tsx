@@ -81,7 +81,7 @@ export default define.page<typeof handler>(({ data }) => {
         {results.map(({ extracts, legislature, session, id, date }) => (
           <div class="border-2 rounded-lg my-2 px-12 py-3">
             <h3 class="text-lg font-bold hover:underline my-3">
-              <a href={`/${legislature}/${session}/${id}`}>
+              <a href={`/legislatures/${legislature}/${session}/${id}`}>
                 {`${id} - ${date.toISOString()}`}
               </a>
             </h3>
