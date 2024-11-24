@@ -10,16 +10,16 @@ import { desc } from "drizzle-orm";
  * Member extracted from the official AssNat website
  */
 export interface MemberAssNat {
-  id: string,
-  first_name: string,
-  last_name: string,
-  note?: string,
-  assnat_url: string,
+  id: string;
+  first_name: string;
+  last_name: string;
+  note?: string;
+  assnat_url: string;
 }
 
 /**
  * Extract all members from the official AssNat website
- * 
+ *
  * It also prints a progress bar to the console.
  */
 export async function getMembersFromAssNat(): Promise<MemberAssNat[]> {
@@ -101,8 +101,11 @@ export async function getMembersFromAssNat(): Promise<MemberAssNat[]> {
   }
 }
 
-export async function writeMemberAssNatToCsv(members: MemberAssNat[], path: string | URL) {
-  const csvMembers = members.map(x => ({
+export async function writeMemberAssNatToCsv(
+  members: MemberAssNat[],
+  path: string | URL,
+) {
+  const csvMembers = members.map((x) => ({
     id: x.id,
     first_name: x.first_name,
     last_name: x.last_name,
@@ -112,27 +115,36 @@ export async function writeMemberAssNatToCsv(members: MemberAssNat[], path: stri
 
   const file = await Deno.open(path, { create: true, write: true });
   await ReadableStream.from(csvMembers)
-  .pipeThrough(new CsvStringifyStream({ columns: ["id", "first_name", "last_name", "note", "assnat_url"] }))
-  .pipeThrough(new TextEncoderStream())
-  .pipeTo(file.writable);
+    .pipeThrough(
+      new CsvStringifyStream({
+        columns: ["id", "first_name", "last_name", "note", "assnat_url"],
+      }),
+    )
+    .pipeThrough(new TextEncoderStream())
+    .pipeTo(file.writable);
 }
 
 /**
  * Members to sessions association extracted from the official AssNat website
  */
 export interface MemberSessionAssNat {
-  legislature: number,
-  session: number,
-  member_id: string,
+  legislature: number;
+  session: number;
+  member_id: string;
 }
 
 /**
  * Associate each member with the sessions they were part of.
- * 
+ *
  * It also prints a progress bar to the console.
  */
-export async function getMembersSessionsFromAssNat(db: Database): Promise<MemberSessionAssNat[]> {
-  const sessionsList = await db.select().from(sessions).orderBy(desc(sessions.legislature), desc(sessions.session));
+export async function getMembersSessionsFromAssNat(
+  db: Database,
+): Promise<MemberSessionAssNat[]> {
+  const sessionsList = await db.select().from(sessions).orderBy(
+    desc(sessions.legislature),
+    desc(sessions.session),
+  );
 
   // Setup progress bar
   const progress = new Bar({
@@ -147,8 +159,9 @@ export async function getMembersSessionsFromAssNat(db: Database): Promise<Member
 
   // Read each page
   const associations: MemberSessionAssNat[] = [];
-  const tasks = sessionsList.map(async s => {
-    const url = `https://www.assnat.qc.ca/fr/travaux-parlementaires/assemblee-nationale/${s.legislature}-${s.session}/membres-assemblee-legislative.html`;
+  const tasks = sessionsList.map(async (s) => {
+    const url =
+      `https://www.assnat.qc.ca/fr/travaux-parlementaires/assemblee-nationale/${s.legislature}-${s.session}/membres-assemblee-legislative.html`;
     const $ = cheerio.load(await http.get(url).text());
 
     const membersEl = $("#TableTriable>tbody>tr>td>a").toArray();
@@ -179,8 +192,11 @@ export async function getMembersSessionsFromAssNat(db: Database): Promise<Member
   }
 }
 
-export async function writeMembersSessionsAssNatToCsv(membersSessions: MemberSessionAssNat[], path: string | URL) {
-  const csvMembersSessions = membersSessions.map(x => ({
+export async function writeMembersSessionsAssNatToCsv(
+  membersSessions: MemberSessionAssNat[],
+  path: string | URL,
+) {
+  const csvMembersSessions = membersSessions.map((x) => ({
     legislature: x.legislature.toString(),
     session: x.session.toString(),
     member_id: x.member_id,
@@ -188,7 +204,11 @@ export async function writeMembersSessionsAssNatToCsv(membersSessions: MemberSes
 
   const file = await Deno.open(path, { create: true, write: true });
   await ReadableStream.from(csvMembersSessions)
-  .pipeThrough(new CsvStringifyStream({ columns: ["legislature", "session", "member_id"] }))
-  .pipeThrough(new TextEncoderStream())
-  .pipeTo(file.writable);
+    .pipeThrough(
+      new CsvStringifyStream({
+        columns: ["legislature", "session", "member_id"],
+      }),
+    )
+    .pipeThrough(new TextEncoderStream())
+    .pipeTo(file.writable);
 }

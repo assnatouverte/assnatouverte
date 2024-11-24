@@ -1,5 +1,10 @@
 import { buildConflictUpdateColumns, type Database } from "@assnatouverte/db";
-import { type Member, members, type MemberSession, membersToSessions } from "@assnatouverte/db/members";
+import {
+  type Member,
+  members,
+  type MemberSession,
+  membersToSessions,
+} from "@assnatouverte/db/members";
 import { asc } from "drizzle-orm";
 
 /** Insert all members into the database */
@@ -28,7 +33,11 @@ export async function insertMembersSessionsInDb(
   await db.insert(membersToSessions)
     .values(data)
     .onConflictDoUpdate({
-      target: [membersToSessions.legislature, membersToSessions.session, membersToSessions.member_id],
+      target: [
+        membersToSessions.legislature,
+        membersToSessions.session,
+        membersToSessions.member_id,
+      ],
       set: buildConflictUpdateColumns(membersToSessions),
     });
 }

@@ -1,0 +1,70 @@
+name: Continuous Integration
+on: push
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Lint check
+        run: deno lint
+      - name: Format check
+        run: deno fmt --check
+      - name: Build container
+        run: |
+          GIT_COMMIT_SHA=${{ github.sha }}
+          GIT_COMMIT_DATE_UNIX=$(git show -s --format=%ct)
+          docker buildx build --build-arg GIT_COMMIT_SHA=$GIT_COMMIT_SHA --build-arg GIT_COMMIT_DATE_UNIX=$GIT_COMMIT_DATE_UNIX -t assnatouverte:$GIT_COMMIT_SHA . &&
+          docker image save assnatouverte:$GIT_COMMIT_SHA | gzip > assnatouverte_$GIT_COMMIT_SHA.tar.gz
+      - name: Save container artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: assnatouverte
+          path: assnatouverte_${{ github.sha }}.tar.gz
+          compression-level: 0
+          if-no-files-found: error
+  Upload:
+    needs: Build
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Download container artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: assnatouverte
+      - name: Upload to GHCR
+        run: |
+          REPO="ghcr.io"
+          IMAGE="${{ github.repository }}"
+          TAG=$(echo "${{ github.sha }}" | head -c 7)
+          COMMIT_IMAGE_NAME="$REPO/$IMAGE:$TAG"
+          LATEST_IMAGE_NAME="$REPO/$IMAGE:latest"
+          ORIGINAL_IMAGE_NAME="assnatouverte:${{ github.sha }}"
+
+          docker load < assnatouverte_${{ github.sha }}.tar.gz &&
+          docker tag $ORIGINAL_IMAGE_NAME $COMMIT_IMAGE_NAME &&
+          docker tag $ORIGINAL_IMAGE_NAME $LATEST_IMAGE_NAME &&
+          docker push $COMMIT_IMAGE_NAME &&
+          docker push $LATEST_IMAGE_NAME
+  Deploy:
+    needs: Upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Wireguard
+        run: |
+          sudo apt install wireguard &&
+          echo "${{ secrets.WG_PRIVATE_KEY }}" > privatekey &&
+          sudo ip link add dev wg0 type wireguard &&
+          sudo ip address add dev wg0 10.101.0.25/24 &&
+          sudo wg set wg0 private-key privatekey peer ${{ secrets.WG_ENDPOINT_PUBLIC_KEY }} allowed-ips 10.101.0.1/32 endpoint ${{ secrets.WG_ENDPOINT }} &&
+          sudo ip link set up dev wg0
+      - name: Run update script
+        run: nc -w1 10.101.0.1 9999

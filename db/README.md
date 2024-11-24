@@ -44,8 +44,9 @@ générer une migration, soit un script SQL pour appliquer les modifications à 
 base de données.
 
 Pour générer automatiquement le code de migration se situant dans le dossier
-[migrations](./migrations), il suffit d'exécuter `deno task generate-migration`. Les
-fichiers contenus dans ce dossier ne devraient _jamais_ être modifié à la main.
+[migrations](./migrations), il suffit d'exécuter `deno task generate-migration`.
+Les fichiers contenus dans ce dossier ne devraient _jamais_ être modifié à la
+main.
 
 Pour appliquer les migrations à une base de données, la fonction `migrate()` est
 disponible.

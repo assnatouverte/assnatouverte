@@ -1,6 +1,6 @@
 {
-  "id": "af5b253f-6688-48c7-8585-04a2f86e5da5",
-  "prevId": "101741df-3934-4b7a-925d-2309cbe71142",
+  "id": "73ae3adf-702f-4bab-a5b7-5a54c5e5fcfb",
+  "prevId": "af5b253f-6688-48c7-8585-04a2f86e5da5",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -47,6 +47,171 @@
           "columns": [
             "legislature",
             "session"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.proceedings": {
+      "name": "proceedings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "legislature": {
+          "name": "legislature",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "session": {
+          "name": "session",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "url": {
+          "name": "url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "volume": {
+          "name": "volume",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "number": {
+          "name": "number",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "preliminary": {
+          "name": "preliminary",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "proceedings_legislature_session_sessions_legislature_session_fk": {
+          "name": "proceedings_legislature_session_sessions_legislature_session_fk",
+          "tableFrom": "proceedings",
+          "tableTo": "sessions",
+          "columnsFrom": [
+            "legislature",
+            "session"
+          ],
+          "columnsTo": [
+            "legislature",
+            "session"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "public.speeches": {
+      "name": "speeches",
+      "schema": "",
+      "columns": {
+        "proceeding_id": {
+          "name": "proceeding_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "speaker": {
+          "name": "speaker",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "member": {
+          "name": "member",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "search": {
+          "name": "search",
+          "type": "tsvector",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "as": "to_tsvector('french', \"speeches\".\"text\")",
+            "type": "stored"
+          }
+        }
+      },
+      "indexes": {
+        "search_idx": {
+          "name": "search_idx",
+          "columns": [
+            {
+              "expression": "search",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "speeches_member_members_id_fk": {
+          "name": "speeches_member_members_id_fk",
+          "tableFrom": "speeches",
+          "tableTo": "members",
+          "columnsFrom": [
+            "member"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "speeches_proceeding_id_order_pk": {
+          "name": "speeches_proceeding_id_order_pk",
+          "columns": [
+            "proceeding_id",
+            "order"
           ]
         }
       },
