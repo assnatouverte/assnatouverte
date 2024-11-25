@@ -1,6 +1,6 @@
 import { CsvParseStream } from "@std/csv/parse-stream";
 import { CsvStringifyStream } from "@std/csv/stringify-stream";
-import type { Member, MemberSession } from "@assnatouverte/db/members";
+import type { Gender, Member, MemberSession } from "@assnatouverte/db/members";
 
 const columns = [
   "id",
@@ -9,6 +9,7 @@ const columns = [
   "note",
   "assnat_url",
   "wikidata_id",
+  "gender",
 ];
 
 /** Read CSV file to retrieve all members */
@@ -30,7 +31,8 @@ export async function readMembersFromCsv(
     first_name: x.first_name,
     last_name: x.last_name,
     note: x.note || null,
-    assnat_url: x.assnat_url,
+    gender: x.gender as Gender,
+    assnat_url: x.assnat_url as Gender,
     wikidata_id: x.wikidata_id || null,
   }));
 }
@@ -42,6 +44,7 @@ export async function writeMembersToCsv(members: Member[], path: string | URL) {
     first_name: x.first_name,
     last_name: x.last_name,
     note: x.note || "",
+    gender: x.gender,
     assnat_url: x.assnat_url,
     wikidata_id: x.wikidata_id || "",
   }));

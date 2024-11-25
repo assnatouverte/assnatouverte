@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
   foreignKey,
+  pgEnum,
   pgTable,
   primaryKey,
   smallint,
@@ -8,12 +9,15 @@ import {
 } from "drizzle-orm/pg-core";
 import { sessions } from "./sessions.ts";
 
+export const genderEnum = pgEnum('gender', ['M', 'F']);
+
 // deno-lint-ignore no-slow-types
 export const members = pgTable("members", {
   id: varchar("id").primaryKey(), // The assnat.qc.ca ID, found in the URL
   first_name: varchar("first_name").notNull(), // Member first name
   last_name: varchar("last_name").notNull(), // Member last name
   note: varchar("note"), // Optional note, used to differentiate members sharing the same name
+  gender: genderEnum().notNull(), // Gender of the person (M or F)
 
   // External links
   assnat_url: varchar("assnat_url"), // Link to the assnat.qc.ca page
@@ -51,6 +55,7 @@ export const membersToSessionsRelations = relations(
   }),
 );
 
+export type Gender = 'M' | 'F';
 export type Member = typeof members.$inferSelect;
 export type NewMember = typeof members.$inferInsert;
 export type MemberSession = typeof membersToSessions.$inferSelect;

@@ -89,7 +89,7 @@ export async function taskGetFromWikidata(): Promise<number> {
   const members = await getMembersFromWikidata();
   await writeMemberWikidataToCsv(
     members,
-    resolve(rawDirectory, "wikidata.csv"),
+    resolve(rawDirectory, "members_wikidata.csv"),
   );
   console.log(`${members.length} membres dans Wikidata.`);
 
