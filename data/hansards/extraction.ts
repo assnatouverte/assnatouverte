@@ -1,7 +1,7 @@
 import * as cheerio from "cheerio";
 import { extractDate } from "../utils/date.ts";
 import { buildConflictUpdateColumns, type Database } from "@assnatouverte/db";
-import { members, membersToSessions } from "@assnatouverte/db/members";
+import { members, membersToSessions, type Gender } from "@assnatouverte/db/members";
 import {
   type NewSpeech,
   proceedings,
@@ -85,8 +85,8 @@ export async function extractHansard(path: string, db: Database) {
     }
 
     const speakers: Record<string, string> = {};
-    const speakersNotFound: Record<string, number> = {};
-    const speakersAmbiguous: Record<string, number> = {};
+    const speakersNotFound: string[] = [];
+    const speakersAmbiguous: string[] = [];
     let numRequests = 0;
     let currentSpeaker: string | undefined = undefined;
     let currentSpeakerId: string | undefined = undefined;
@@ -160,10 +160,19 @@ export async function extractHansard(path: string, db: Database) {
         let speakerId = speakers[personIdText];
         if (!(personIdText in speakers)) {
           const lastNameMatch = personIdText.match(
-            /(?:M\.|Mme)\s([\wà-üÀ-Ü\s\-]+)/,
+            /(M\.|Mme)\s([\wà-üÀ-Ü\s\-']+)/,
           );
           if (lastNameMatch) {
-            const lastName = lastNameMatch[1]!;
+            const genderStr = lastNameMatch[1]!;
+            const lastName = lastNameMatch[2]!;
+
+            // Determine gender
+            let gender: Gender | null = null;
+            if (genderStr === 'M.') {
+              gender = 'M';
+            } else if (genderStr === 'Mme') {
+              gender = 'F';
+            }
 
             // Query database
             numRequests++;
@@ -174,7 +183,8 @@ export async function extractHansard(path: string, db: Database) {
               and(
                 eq(membersToSessions.legislature, metadata.legislature),
                 eq(membersToSessions.session, metadata.session),
-                like(members.last_name, lastName),
+                like(members.last_name, lastName.trim()),
+                gender ? eq(members.gender, gender) : null,
               ),
             );
 
@@ -183,15 +193,13 @@ export async function extractHansard(path: string, db: Database) {
               speakerId = result[0].members.id;
             } else if (result.length == 0) {
               // Nobody found...
-              speakersNotFound[personIdText] =
-                speakersNotFound[personIdText] + 1 || 1;
+              speakersNotFound.push(personIdText); 
             } else {
               // Multiple possible members...
-              speakersAmbiguous[personIdText] =
-                speakersAmbiguous[personIdText] + 1 || 1;
+              speakersAmbiguous.push(personIdText);
             }
 
-            // Save it in cache
+            // Save it in the cache
             speakers[personIdText] = speakerId;
           }
         }
@@ -204,7 +212,6 @@ export async function extractHansard(path: string, db: Database) {
             member_id: currentSpeakerId,
             text: currentSpeech.join("\n"),
           });
-          //await saveSpeechToDatabase(tx, metadata.id, currentOrder++, currentSpeech, currentSpeaker!, currentSpeakerId);
           currentSpeech = [];
         }
 
@@ -246,7 +253,6 @@ export async function extractHansard(path: string, db: Database) {
         member_id: currentSpeakerId,
         text: currentSpeech.join("\n"),
       });
-      //await saveSpeechToDatabase(tx, metadata.id, currentOrder++, currentSpeech, currentSpeaker!, currentSpeakerId);
     }
 
     // Insert all the speeches in one batch
@@ -264,11 +270,12 @@ export async function extractHansard(path: string, db: Database) {
       ),
     );
 
-    console.log(speakers);
-    console.log("Not found:");
-    console.log(speakersNotFound);
-    console.log("Ambiguous:");
-    console.log(speakersAmbiguous);
-    console.log(`Num requests: ${numRequests}`);
+    // Print stats
+    if (speakersNotFound.length > 0) {
+      console.log(`%cNot found: ${speakersNotFound}`, "color: red;");
+    }
+    if (speakersAmbiguous.length > 0) {
+      console.log(`%cAmbiguous: ${speakersAmbiguous}`, "color: yellow;");
+    }
   });
 }

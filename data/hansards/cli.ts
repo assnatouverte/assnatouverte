@@ -23,9 +23,19 @@ export const commands: Commands = {
 /**
  * Obtient les journaux de débats depuis le site web de l'Assemblée nationale du Québec
  */
-export async function taskGetFromAssNat(): Promise<number> {
-  const legislature = 42;
-  const session = 1;
+export async function taskGetFromAssNat(ctx: CommandContext): Promise<number> {
+  if (ctx.args.length < 2) {
+    console.log("%cAucune législature/session spécifiée", "color: red");
+    return 1;
+  }
+
+  const legislature = parseInt(ctx.args[0]);
+  const session = parseInt(ctx.args[1]);
+
+  if (isNaN(legislature) || isNaN(session)) {
+    console.log("%cLégislature/session invalide", "color: red");
+    return 1;
+  }
 
   const dir = resolve(rawDirectory, "hansards", `${legislature}-${session}`);
   Deno.mkdir(dir, { recursive: true });
@@ -37,8 +47,18 @@ export async function taskGetFromAssNat(): Promise<number> {
 export async function taskExtractTextFromHansard(
   ctx: CommandContext,
 ): Promise<number> {
-  const legislature = 42;
-  const session = 1;
+  if (ctx.args.length < 2) {
+    console.log("%cAucune législature/session spécifiée", "color: red");
+    return 1;
+  }
+
+  const legislature = parseInt(ctx.args[0]);
+  const session = parseInt(ctx.args[1]);
+
+  if (isNaN(legislature) || isNaN(session)) {
+    console.log("%cLégislature/session invalide", "color: red");
+    return 1;
+  }
 
   const dir = resolve(rawDirectory, "hansards", `${legislature}-${session}`);
 

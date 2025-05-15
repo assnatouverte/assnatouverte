@@ -26,6 +26,7 @@ export interface Command {
  */
 export interface CommandContext {
   db: Database;
+  args: string[];
 }
 
 /**
@@ -84,6 +85,7 @@ export async function run(): Promise<number> {
   const [client, db] = createDb();
   const context = {
     db,
+    args: args._.slice(2).map((arg) => arg.toString()),
   };
 
   // Execute command
